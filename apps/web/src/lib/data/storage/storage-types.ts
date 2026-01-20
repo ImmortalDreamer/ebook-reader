@@ -9,7 +9,8 @@ export enum StorageKey {
   BROWSER = 'browser',
   FS = 'fs',
   GDRIVE = 'gdrive',
-  ONEDRIVE = 'onedrive'
+  ONEDRIVE = 'onedrive',
+  WEBDAV = 'webdav'
 }
 
 export enum StorageDataType {
@@ -23,7 +24,8 @@ export enum StorageDataType {
 
 export enum StorageSourceDefault {
   GDRIVE_DEFAULT = 'ttu-gdrive-default',
-  ONEDRIVE_DEFAULT = 'ttu-onedrive-default'
+  ONEDRIVE_DEFAULT = 'ttu-onedrive-default',
+  WEBDAV_DEFAULT = 'ttu-webdav-default'
 }
 
 export enum InternalStorageSources {
@@ -40,5 +42,6 @@ export const internalStorageSourceName = new Set<string>([
 
 export const defaultStorageSources = [
   { name: StorageSourceDefault.GDRIVE_DEFAULT, type: StorageKey.GDRIVE },
-  { name: StorageSourceDefault.ONEDRIVE_DEFAULT, type: StorageKey.ONEDRIVE }
+  { name: StorageSourceDefault.ONEDRIVE_DEFAULT, type: StorageKey.ONEDRIVE },
+  { name: StorageSourceDefault.WEBDAV_DEFAULT, type: StorageKey.WEBDAV }
 ];

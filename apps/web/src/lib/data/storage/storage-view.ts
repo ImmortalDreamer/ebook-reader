@@ -11,7 +11,8 @@ import {
   gDriveScope,
   oneDriveAuthEndpoint,
   oneDriveClientId,
-  oneDriveScope
+  oneDriveScope,
+  webDavDefaultServer
 } from '$lib/data/env';
 
 import { writableStringLocalStorageSubject } from '$lib/data/internal/writable-string-local-storage-subject';
@@ -59,6 +60,12 @@ export function isStorageSourceAvailable(
       hasValidEnvironment = !!storageSourceManager && 'showDirectoryPicker' in window;
       break;
 
+    case StorageKey.WEBDAV:
+      hasValidEnvironment =
+        (storageSourceManager && storageSourceManager !== StorageSourceDefault.WEBDAV_DEFAULT) ||
+        !!webDavDefaultServer;
+      break;
+
     default:
       break;
   }
@@ -87,6 +94,11 @@ export function getStorageIconData(storageSource: StorageKey): StorageIcon {
       return {
         viewBox: '0 0 576 512',
         d: 'M544 32h-112l-32-32H320c-17.62 0-32 14.38-32 32v160c0 17.62 14.38 32 32 32h224c17.62 0 32-14.38 32-32V64C576 46.38 561.6 32 544 32zM544 320h-112l-32-32H320c-17.62 0-32 14.38-32 32v160c0 17.62 14.38 32 32 32h224c17.62 0 32-14.38 32-32v-128C576 334.4 561.6 320 544 320zM64 16C64 7.125 56.88 0 48 0h-32C7.125 0 0 7.125 0 16V416c0 17.62 14.38 32 32 32h224v-64H64V160h192V96H64V16z'
+      };
+    case StorageKey.WEBDAV:
+      return {
+        viewBox: '0 0 640 512',
+        d: 'M537.6 226.6c4.1-10.7 6.4-22.4 6.4-34.6 0-53-43-96-96-96-19.7 0-38.1 6-53.3 16.2C367 64.2 315.3 32 256 32c-88.4 0-160 71.6-160 160 0 2.7.1 5.4.2 8.1C40.2 219.8 0 273.2 0 336c0 79.5 64.5 144 144 144h368c70.7 0 128-57.3 128-128 0-61.9-44-113.6-102.4-125.4zM393.4 288H328v112c0 8.8-7.2 16-16 16h-48c-8.8 0-16-7.2-16-16V288h-65.4c-14.3 0-21.4-17.2-11.3-27.3l105.4-105.4c6.2-6.2 16.4-6.2 22.6 0l105.4 105.4c10.1 10.1 2.9 27.3-11.3 27.3z'
       };
     default:
       return {

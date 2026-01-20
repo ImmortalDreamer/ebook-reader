@@ -32,3 +32,4 @@ export const oneDriveDiscoveryEndpoint =
 export const oneDriveScope = import.meta.env.VITE_ONEDRIVE_SCOPE || 'files.readwrite';
 export const oneDriveClientId = import.meta.env.VITE_ONEDRIVE_CLIENT_ID || '';
 export const oneDriveClientSecret = import.meta.env.VITE_ONEDRIVE_CLIENT_SECRET || '';
+export const webDavDefaultServer = import.meta.env.VITE_WEBDAV_DEFAULT_SERVER || '';

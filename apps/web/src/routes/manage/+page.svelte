@@ -232,7 +232,7 @@
 
   function operationAllowed() {
     const connectivityPass = !(
-      ($storageSource$ === StorageKey.GDRIVE || $storageSource$ === StorageKey.ONEDRIVE) &&
+      ($storageSource$ === StorageKey.GDRIVE || $storageSource$ === StorageKey.ONEDRIVE || $storageSource$ === StorageKey.WEBDAV) &&
       !$isOnline$
     );
 

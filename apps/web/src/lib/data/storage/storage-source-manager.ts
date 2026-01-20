@@ -9,7 +9,7 @@ import {
   StorageSourceDefault,
   internalStorageSourceName
 } from '$lib/data/storage/storage-types';
-import { fsStorageSource$, gDriveStorageSource$, oneDriveStorageSource$ } from '$lib/data/store';
+import { fsStorageSource$, gDriveStorageSource$, oneDriveStorageSource$, webDavStorageSource$ } from '$lib/data/store';
 
 import type { BooksDbStorageSource } from '$lib/data/database/books-db/versions/books-db';
 import StorageUnlock from '$lib/components/storage-unlock.svelte';
@@ -50,6 +50,9 @@ export interface RemoteContext {
   clientId: string;
   clientSecret: string;
   refreshToken?: string;
+  serverUrl?: string;
+  username?: string;
+  password?: string;
 }
 
 export interface StorageSourceSaveResult {
@@ -65,6 +68,7 @@ export function isAppDefault(name: string) {
   return (
     name === StorageSourceDefault.GDRIVE_DEFAULT ||
     name === StorageSourceDefault.ONEDRIVE_DEFAULT ||
+    name === StorageSourceDefault.WEBDAV_DEFAULT ||
     internalStorageSourceName.has(name)
   );
 }
@@ -76,6 +80,9 @@ export function setStorageSourceDefault(name: string, type: StorageKey) {
       break;
     case StorageKey.ONEDRIVE:
       oneDriveStorageSource$.next(name || StorageSourceDefault.ONEDRIVE_DEFAULT);
+      break;
+    case StorageKey.WEBDAV:
+      webDavStorageSource$.next(name || StorageSourceDefault.WEBDAV_DEFAULT);
       break;
     case StorageKey.FS:
       fsStorageSource$.next(name);
@@ -185,5 +192,9 @@ export async function unlockStorageData(
 export function isRemoteContext(
   data: FsHandle | ArrayBuffer | RemoteContext
 ): data is RemoteContext {
-  return !!(data && 'clientId' in data && data.clientId);
+  return !!(
+    data &&
+    (('clientId' in data && data.clientId) ||
+      ('serverUrl' in data && data.serverUrl && 'username' in data && data.username))
+  );
 }

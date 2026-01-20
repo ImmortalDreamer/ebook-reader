@@ -232,6 +232,11 @@ export const oneDriveStorageSource$ = writableStringLocalStorageSubject()(
   StorageSourceDefault.ONEDRIVE_DEFAULT
 );
 
+export const webDavStorageSource$ = writableStringLocalStorageSubject()(
+  'webDavStorageSource',
+  StorageSourceDefault.WEBDAV_DEFAULT
+);
+
 export const fsStorageSource$ = writableStringLocalStorageSubject()('fsStorageSource', '');
 
 export const syncTarget$ = writableStringLocalStorageSubject()('syncTarget', '');

@@ -54,9 +54,13 @@
   let storageSourceStoredInManager =
     (passwordManagerAvailable && configuredStoredInManager) || false;
   let storageSourceEncryptionDisabled = configuredEncryptionDisabled || false;
+  let storageSourceServerUrl = configuredRemoteData?.serverUrl || '';
+  let storageSourceUsername = configuredRemoteData?.username || '';
+  let storageSourcePassword = configuredRemoteData?.password || '';
   let storageSourceTypes = [
     { key: StorageKey.GDRIVE, label: 'GDrive' },
-    { key: StorageKey.ONEDRIVE, label: 'OneDrive' }
+    { key: StorageKey.ONEDRIVE, label: 'OneDrive' },
+    { key: StorageKey.WEBDAV, label: 'WebDAV' }
   ];
 
   $: if (browser && 'showDirectoryPicker' in window) {
@@ -151,6 +155,33 @@
         }
 
         storageSourceData = { directoryHandle, fsPath: handleFsPath };
+      } else if (storageSourceType === StorageKey.WEBDAV) {
+        credentialsChanged =
+          storageSourceServerUrl !== configuredRemoteData?.serverUrl ||
+          storageSourceUsername !== configuredRemoteData?.username ||
+          storageSourcePassword !== configuredRemoteData?.password;
+
+        if (storageSourceEncryptionDisabled) {
+          storageSourceData = {
+            clientId: '',
+            clientSecret: '',
+            serverUrl: storageSourceServerUrl,
+            username: storageSourceUsername,
+            password: storageSourcePassword
+          };
+        } else {
+          storageSourceData = await encrypt(
+            window,
+            JSON.stringify({
+              clientId: '',
+              clientSecret: '',
+              serverUrl: storageSourceServerUrl,
+              username: storageSourceUsername,
+              password: storageSourcePassword
+            }),
+            pwConfirmElm.value
+          );
+        }
       } else {
         credentialsChanged =
           storageSourceClientId !== configuredRemoteData?.clientId ||
@@ -277,11 +308,22 @@
         if (storageSourceType === StorageKey.FS) {
           storageSourceClientId = '';
           storageSourceClientSecret = '';
+          storageSourceServerUrl = '';
+          storageSourceUsername = '';
+          storageSourcePassword = '';
           storageSourceStoredInManager = false;
           storageSourceEncryptionDisabled = false;
+        } else if (storageSourceType === StorageKey.WEBDAV) {
+          storageSourceClientId = '';
+          storageSourceClientSecret = '';
+          directoryHandle = undefined;
+          handleFsPath = '';
         } else {
           directoryHandle = undefined;
           handleFsPath = '';
+          storageSourceServerUrl = '';
+          storageSourceUsername = '';
+          storageSourcePassword = '';
         }
       }}
     >
@@ -297,6 +339,54 @@
         <Ripple />
       </button>
       <div class="my-4 text-center">{handleFsPath || 'Nothing selected'}</div>
+    {:else if storageSourceType === StorageKey.WEBDAV}
+      <input required type="url" placeholder="Server URL (e.g., https://cloud.example.com/remote.php/dav/files/username)" bind:value={storageSourceServerUrl} />
+      <input class="mt-4" required type="text" placeholder="Username" bind:value={storageSourceUsername} />
+      <input class="mt-4" required type="password" placeholder="WebDAV Password" bind:value={storageSourcePassword} />
+      <input
+        class="mt-4"
+        type="password"
+        placeholder="Encryption Password"
+        required={!storageSourceEncryptionDisabled}
+        disabled={storageSourceEncryptionDisabled}
+        bind:this={pwElm}
+      />
+      <input
+        class="mt-4"
+        type="password"
+        placeholder="Confirm Encryption Password"
+        required={!storageSourceEncryptionDisabled}
+        disabled={storageSourceEncryptionDisabled}
+        bind:this={pwConfirmElm}
+      />
+      {#if passwordManagerAvailable}
+        <div class="mt-4">
+          <input
+            id="cbx-store-in-manager-webdav"
+            type="checkbox"
+            bind:checked={storageSourceStoredInManager}
+            on:change={() => {
+              if (storageSourceStoredInManager && storageSourceEncryptionDisabled) {
+                storageSourceEncryptionDisabled = false;
+              }
+            }}
+          />
+          <label for="cbx-store-in-manager-webdav" class="ml-2">Store in Password Manager</label>
+        </div>
+      {/if}
+      <div class="mt-4">
+        <input
+          id="cbx-disable-encryption-webdav"
+          type="checkbox"
+          bind:checked={storageSourceEncryptionDisabled}
+          on:change={() => {
+            if (storageSourceEncryptionDisabled && storageSourceStoredInManager) {
+              storageSourceStoredInManager = false;
+            }
+          }}
+        />
+        <label for="cbx-disable-encryption-webdav" class="ml-2">Disable Encryption</label>
+      </div>
     {:else}
       <input required type="text" placeholder="Client ID" bind:value={storageSourceClientId} />
       <input
